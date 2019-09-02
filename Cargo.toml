@@ -5,3 +5,4 @@ authors = ["Souma Suzuki <suzuki.souma@hrbrain.co.jp>"]
 edition = "2018"
 
 [dependencies]
+actix-web = "1.0.0"
