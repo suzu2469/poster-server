@@ -17,6 +17,7 @@ fn main() -> std::io::Result<()> {
             .service(index)
             .service(controller::todo::list)
             .service(controller::todo::create)
+            .service(controller::todo::update)
     })
     .bind("127.0.0.1:8080")?
     .run()
