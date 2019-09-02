@@ -1,0 +1,7 @@
+[package]
+name = "poster-server"
+version = "0.1.0"
+authors = ["Souma Suzuki <suzuki.souma@hrbrain.co.jp>"]
+edition = "2018"
+
+[dependencies]
