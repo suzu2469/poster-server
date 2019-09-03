@@ -2,7 +2,7 @@
 extern crate actix_web;
 extern crate serde_derive;
 
-mod controller;
+mod handler;
 
 use actix_web::{App, HttpServer, Responder};
 
@@ -15,9 +15,9 @@ fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .service(index)
-            .service(controller::todo::list)
-            .service(controller::todo::create)
-            .service(controller::todo::update)
+            .service(handler::todo::list)
+            .service(handler::todo::create)
+            .service(handler::todo::update)
     })
     .bind("127.0.0.1:8080")?
     .run()
