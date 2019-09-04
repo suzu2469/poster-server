@@ -2,6 +2,7 @@ use crate::domain::entity::todo::Todo;
 use crate::domain::repository::todo::TodoRepository;
 use chrono::Utc;
 
+#[derive(Copy, Clone)]
 pub struct MockDatastore {}
 
 impl TodoRepository for MockDatastore {

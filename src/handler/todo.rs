@@ -1,15 +1,15 @@
-use actix_web::{get, post, put, web, HttpResponse, Result};
-use serde::{Deserialize, Serialize};
+use actix_web::{HttpRequest, HttpResponse, Result};
 
 use crate::application::controller::todo::TodoController;
+use crate::domain::repository::todo::TodoRepository;
 
-pub struct TodoHandler {
-    todo_controller: TodoController,
+#[derive(Copy, Clone)]
+pub struct TodoHandler<T: TodoRepository> {
+    pub todo_controller: TodoController<T>,
 }
 
-impl TodoHandler {
-    #[get("/todos")]
-    pub fn list(&self) -> Result<HttpResponse> {
+impl<T: TodoRepository> TodoHandler<T> {
+    pub fn list(&self, _r: HttpRequest) -> Result<HttpResponse> {
         self.todo_controller.list()
     }
 }
