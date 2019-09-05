@@ -47,6 +47,6 @@ fn main() -> std::io::Result<()> {
             .service(index)
             .route("/todos", web::get().to(move |r| todo_handler.list(r)))
     })
-    .bind(format!("127.0.0.1:{}", options.port))?
+    .bind(format!("0.0.0.0:{}", options.port))?
     .run()
 }
