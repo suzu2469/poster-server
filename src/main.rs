@@ -17,6 +17,7 @@ fn index() -> impl Responder {
 
 fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
+    let port = std::env::var("PORT").unwrap_or("3000".to_string());
     env_logger::init();
 
     let todo_presenter = application::presenter::todo::TodoPresenter {};
@@ -35,6 +36,6 @@ fn main() -> std::io::Result<()> {
             .service(index)
             .route("/todos", web::get().to(move |r| todo_handler.list(r)))
     })
-    .bind("127.0.0.1:8080")?
+    .bind(format!("127.0.0.1:{}", port))?
     .run()
 }

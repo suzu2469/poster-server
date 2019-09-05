@@ -9,7 +9,7 @@ pub struct TodoHandler<T: TodoRepository> {
 }
 
 impl<T: TodoRepository> TodoHandler<T> {
-    pub fn list(&self, _r: HttpRequest) -> Result<HttpResponse> {
+    pub fn list(&self, _r: HttpRequest)  -> Result<HttpResponse> {
         self.todo_controller.list()
     }
 }
