@@ -1,6 +1,8 @@
+extern crate structopt;
 #[macro_use]
 extern crate actix_web;
 extern crate serde_derive;
+extern crate structopt_derive;
 
 pub mod application;
 mod domain;
@@ -9,6 +11,14 @@ mod infrastructure;
 
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer, Responder};
+use structopt::StructOpt;
+
+#[derive(StructOpt)]
+#[structopt(name = "poster-server")]
+struct Options {
+    #[structopt(short = "p", long = "port", default_value = "3000")]
+    port: u16
+}
 
 #[get("/")]
 fn index() -> impl Responder {
@@ -17,8 +27,9 @@ fn index() -> impl Responder {
 
 fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
-    let port = std::env::var("PORT").unwrap_or("3000".to_string());
     env_logger::init();
+
+    let options = Options::from_args();
 
     let todo_presenter = application::presenter::todo::TodoPresenter {};
     let todo_repository = infrastructure::mock::todo::MockDatastore {};
@@ -36,6 +47,6 @@ fn main() -> std::io::Result<()> {
             .service(index)
             .route("/todos", web::get().to(move |r| todo_handler.list(r)))
     })
-    .bind(format!("127.0.0.1:{}", port))?
+    .bind(format!("127.0.0.1:{}", options.port))?
     .run()
 }

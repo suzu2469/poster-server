@@ -5,4 +5,4 @@ COPY . .
 
 RUN cargo build --release
 
-CMD ["./target/release/poster-server"]
+CMD cargo run --release -- -p $PORT
