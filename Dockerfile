@@ -1,8 +1,8 @@
-FROM rust:1.37
+FROM rust:1.37.0-slim-stretch
 
 WORKDIR /usr/src/poster-server
 COPY . .
 
-RUN cargo build --release
+RUN cargo install --path .
 
-CMD cargo run --release -- -p $PORT
+CMD poster-server -p $PORT
