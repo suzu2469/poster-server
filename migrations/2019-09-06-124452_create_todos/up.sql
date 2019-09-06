@@ -1,0 +1,7 @@
+-- Your SQL goes here
+CREATE TABLE todos (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    is_done BOOLEAN NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
