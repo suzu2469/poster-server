@@ -2,8 +2,8 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 
 use crate::domain::entity::todo::Todo;
-use crate::domain::repository::todo::{TodoCreateDTO, TodoRepository};
-use crate::infrastructure::postgres::table::todo::{Todo as TodoTable, TodoCreate};
+use crate::domain::repository::todo::{TodoCreateDTO, TodoRepository, TodoUpdateDTO};
+use crate::infrastructure::postgres::table::todo::{Todo as TodoTable, TodoCreate, TodoUpdate};
 use crate::shared::DBConnection;
 
 #[derive(Copy, Clone)]
@@ -38,10 +38,28 @@ impl TodoRepository for PgAdapter {
         };
 
         let db = conn.get().expect("Connection not found");
-        let result = diesel::insert_into(todos)
+        let _result = diesel::insert_into(todos)
             .values(todo_create)
             .execute(&db)
             .expect("Todo can not be created");
+
+        Ok(())
+    }
+
+    fn update(&self, conn: &DBConnection, target_id: i32, dto: &TodoUpdateDTO) -> Result<(), ()> {
+        use crate::schema::todos::dsl::*;
+
+        let todo_update = TodoUpdate {
+            id: target_id,
+            is_done: dto.is_done,
+            name: dto.name.clone(),
+        };
+
+        let db = conn.get().expect("Connection not found");
+        let _result = diesel::update(todos)
+            .set(&todo_update)
+            .execute(&db)
+            .expect("Todo can not be updated");
 
         Ok(())
     }

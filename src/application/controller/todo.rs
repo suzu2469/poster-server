@@ -2,7 +2,7 @@ use actix_web::{HttpResponse, Result};
 use serde::Deserialize;
 
 use crate::application::usecase::todo::TodoUsecase;
-use crate::domain::repository::todo::{TodoCreateDTO, TodoRepository};
+use crate::domain::repository::todo::{TodoCreateDTO, TodoRepository, TodoUpdateDTO};
 use crate::shared::DBConnection;
 
 #[derive(Copy, Clone)]
@@ -21,11 +21,30 @@ impl<T: TodoRepository> TodoController<T> {
         };
         self.todo_usecase.create(conn, &dto)
     }
+    pub fn update(
+        &self,
+        conn: &DBConnection,
+        id: i32,
+        input: &TodoUpdateInput,
+    ) -> Result<HttpResponse> {
+        let dto = TodoUpdateDTO {
+            name: input.name.clone(),
+            is_done: input.is_done,
+        };
+        self.todo_usecase.update(conn, id, &dto)
+    }
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TodoCreateInput {
+    pub name: String,
+    pub is_done: bool,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TodoUpdateInput {
     pub name: String,
     pub is_done: bool,
 }
