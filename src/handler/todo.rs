@@ -5,7 +5,6 @@ use crate::application::controller::todo::{TodoController, TodoCreateInput, Todo
 use crate::domain::repository::todo::TodoRepository;
 use crate::shared::DBConnection;
 
-
 #[derive(Copy, Clone)]
 pub struct TodoHandler<T: TodoRepository> {
     pub todo_controller: TodoController<T>,
@@ -30,9 +29,21 @@ impl<T: TodoRepository> TodoHandler<T> {
     ) -> Result<HttpResponse> {
         self.todo_controller.update(pool, path.id, data)
     }
+    pub fn delete(
+        &self,
+        pool: &web::Data<DBConnection>,
+        path: &web::Path<TodoDeletePath>,
+    ) -> Result<HttpResponse> {
+        self.todo_controller.delete(pool, path.id)
+    }
 }
 
 #[derive(Deserialize)]
 pub struct TodoUpdatePath {
+    id: i32,
+}
+
+#[derive(Deserialize)]
+pub struct TodoDeletePath {
     id: i32,
 }

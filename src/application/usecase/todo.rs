@@ -36,4 +36,12 @@ impl<T: TodoRepository> TodoUsecase<T> {
             Err(()) => Ok(self.todo_presenter.ng(None)),
         }
     }
+
+    pub fn delete(&self, conn: &DBConnection, id: i32) -> Result<HttpResponse> {
+        let res = self.todo_repository.delete(conn, id);
+        match res {
+            Ok(()) => Ok(self.todo_presenter.ok(None)),
+            Err(()) => Ok(self.todo_presenter.ng(None)),
+        }
+    }
 }

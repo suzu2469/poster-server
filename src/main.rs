@@ -12,7 +12,7 @@ mod handler;
 mod infrastructure;
 mod schema;
 
-use crate::handler::todo::TodoUpdatePath;
+use crate::handler::todo::{TodoDeletePath, TodoUpdatePath};
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer, Responder};
 use infrastructure::postgres::connection;
@@ -63,11 +63,32 @@ fn main() -> std::io::Result<()> {
                 web::get()
                     .to(move |pool: web::Data<shared::DBConnection>| todo_handler.list(&pool))
 
-            ).route("/todos", web::post()
-                    .to(move |pool: web::Data<shared::DBConnection>, data: web::Json<application::controller::todo::TodoCreateInput>| todo_handler.create(&pool, &data)),
-            ).route("/todos/{id}", web::put().to(move |pool: web::Data<shared::DBConnection>, data: web::Json<application::controller::todo::TodoUpdateInput>, path: web::Path<TodoUpdatePath>|
-                todo_handler.update(&pool, &data, &path)
-            ))
+            ).route(
+                "/todos",
+                web::post().to(
+                        move |
+                            pool: web::Data<shared::DBConnection>,
+                            data: web::Json<application::controller::todo::TodoCreateInput>
+                        |
+                            todo_handler.create(&pool, &data)
+                ),
+            ).route(
+                "/todos/{id}",
+                web::put().to(
+                    move |
+                        pool: web::Data<shared::DBConnection>,
+                        data: web::Json<application::controller::todo::TodoUpdateInput>,
+                        path: web::Path<TodoUpdatePath>
+                    |
+                        todo_handler.update(&pool, &data, &path)
+            )).route(
+                "/todos/{id}",
+                web::delete().to(
+                    move |
+                        pool: web::Data<shared::DBConnection>,
+                        path: web::Path<TodoDeletePath>
+                    |
+                        todo_handler.delete(&pool, &path)))
     })
     .bind(format!("0.0.0.0:{}", options.port))?
     .run()

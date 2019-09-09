@@ -33,6 +33,9 @@ impl<T: TodoRepository> TodoController<T> {
         };
         self.todo_usecase.update(conn, id, &dto)
     }
+    pub fn delete(&self, conn: &DBConnection, id: i32) -> Result<HttpResponse> {
+        self.todo_usecase.delete(conn, id)
+    }
 }
 
 #[derive(Deserialize)]

@@ -5,6 +5,7 @@ pub trait TodoRepository {
     fn list(&self, conn: &DBConnection) -> Vec<Todo>;
     fn create(&self, conn: &DBConnection, dto: &TodoCreateDTO) -> Result<(), ()>;
     fn update(&self, conn: &DBConnection, id: i32, dto: &TodoUpdateDTO) -> Result<(), ()>;
+    fn delete(&self, conn: &DBConnection, id: i32) -> Result<(), ()>;
 }
 
 pub struct TodoCreateDTO {

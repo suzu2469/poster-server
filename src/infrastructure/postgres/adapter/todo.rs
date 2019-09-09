@@ -63,4 +63,14 @@ impl TodoRepository for PgAdapter {
 
         Ok(())
     }
+
+    fn delete(&self, conn: &DBConnection, target_id: i32) -> Result<(), ()> {
+        use crate::schema::todos::dsl::*;
+
+        let db = conn.get().expect("Connection not found");
+        diesel::delete(todos.filter(id.eq(target_id)))
+            .execute(&db)
+            .expect(&format!("This todo can not be deleted id = {}", target_id));
+        Ok(())
+    }
 }
