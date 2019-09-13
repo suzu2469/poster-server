@@ -2,40 +2,46 @@ use actix_web::{web, HttpResponse, Result};
 use serde::Deserialize;
 
 use crate::application::controller::todo::{TodoController, TodoCreateInput, TodoUpdateInput};
-use crate::domain::repository::todo::TodoRepository;
+use crate::application::presenter::todo::TodoPresenter;
+use crate::application::usecase::todo::TodoUsecase;
+use crate::infrastructure::postgres::adapter::todo::PgAdapter;
 use crate::shared::DBConnection;
 
-#[derive(Copy, Clone)]
-pub struct TodoHandler<T: TodoRepository> {
-    pub todo_controller: TodoController<T>,
+fn todo_controller_factory() -> TodoController<PgAdapter> {
+    let todo_presenter = TodoPresenter {};
+    let todo_repository = PgAdapter {};
+    let todo_usecase = TodoUsecase {
+        todo_presenter,
+        todo_repository,
+    };
+    TodoController { todo_usecase }
 }
 
-impl<T: TodoRepository> TodoHandler<T> {
-    pub fn list(&self, pool: &web::Data<DBConnection>) -> Result<HttpResponse> {
-        self.todo_controller.list(pool.get_ref())
-    }
-    pub fn create(
-        &self,
-        pool: &web::Data<DBConnection>,
-        data: &web::Json<TodoCreateInput>,
-    ) -> Result<HttpResponse> {
-        self.todo_controller.create(pool, data)
-    }
-    pub fn update(
-        &self,
-        pool: &web::Data<DBConnection>,
-        data: &web::Json<TodoUpdateInput>,
-        path: &web::Path<TodoUpdatePath>,
-    ) -> Result<HttpResponse> {
-        self.todo_controller.update(pool, path.id, data)
-    }
-    pub fn delete(
-        &self,
-        pool: &web::Data<DBConnection>,
-        path: &web::Path<TodoDeletePath>,
-    ) -> Result<HttpResponse> {
-        self.todo_controller.delete(pool, path.id)
-    }
+pub fn list(pool: web::Data<DBConnection>) -> Result<HttpResponse> {
+    let todo_controller = todo_controller_factory();
+    todo_controller.list(&pool)
+}
+pub fn create(
+    pool: web::Data<DBConnection>,
+    data: web::Json<TodoCreateInput>,
+) -> Result<HttpResponse> {
+    let todo_controller = todo_controller_factory();
+    todo_controller.create(&pool, &data)
+}
+pub fn update(
+    pool: web::Data<DBConnection>,
+    data: web::Json<TodoUpdateInput>,
+    path: web::Path<TodoUpdatePath>,
+) -> Result<HttpResponse> {
+    let todo_controller = todo_controller_factory();
+    todo_controller.update(&pool, path.id, &data)
+}
+pub fn delete(
+    pool: web::Data<DBConnection>,
+    path: web::Json<TodoDeletePath>,
+) -> Result<HttpResponse> {
+    let todo_controller = todo_controller_factory();
+    todo_controller.delete(&pool, path.id)
 }
 
 #[derive(Deserialize)]
