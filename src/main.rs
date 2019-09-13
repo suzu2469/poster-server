@@ -13,6 +13,7 @@ mod infrastructure;
 mod schema;
 
 use crate::handler::todo::{TodoDeletePath, TodoUpdatePath};
+use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer, Responder};
 use infrastructure::postgres::connection;
@@ -57,6 +58,7 @@ fn main() -> std::io::Result<()> {
             .data(pool.clone())
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i %s $T"))
+            .wrap(Cors::new().allowed_origin("*"))
             .service(index)
             .route(
                 "/todos",
