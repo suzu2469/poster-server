@@ -12,7 +12,7 @@ mod handler;
 mod infrastructure;
 mod schema;
 
-use crate::handler::todo::{TodoDeletePath, TodoUpdatePath};
+use crate::handler::todo as TodoHandler;
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::{http::header, web, App, HttpServer, Responder};
@@ -44,56 +44,25 @@ fn main() -> std::io::Result<()> {
 
     let options = Options::from_args();
 
-    let todo_presenter = application::presenter::todo::TodoPresenter {};
-    let todo_repository = infrastructure::postgres::adapter::todo::PgAdapter {};
-    let todo_usecase = application::usecase::todo::TodoUsecase {
-        todo_presenter,
-        todo_repository,
-    };
-    let todo_controller = application::controller::todo::TodoController { todo_usecase };
-    let todo_handler = handler::todo::TodoHandler { todo_controller };
-
     HttpServer::new(move || {
         App::new()
             .data(pool.clone())
-            .wrap(Cors::new()
-                .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
-                .allowed_headers(vec![header::ACCEPT, header::AUTHORIZATION, header::CONTENT_TYPE])
-                .max_age(3600)
+            .wrap(
+                Cors::new()
+                    .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
+                    .allowed_headers(vec![
+                        header::ACCEPT,
+                        header::AUTHORIZATION,
+                        header::CONTENT_TYPE,
+                    ])
+                    .max_age(3600),
             )
             .wrap(Logger::new("%a %{User-Agent}i %s $T"))
             .service(index)
-            .route(
-                "/todos",
-                web::get()
-                    .to(move |pool: web::Data<shared::DBConnection>| todo_handler.list(&pool))
-
-            ).route(
-                "/todos",
-                web::post().to(
-                        move |
-                            pool: web::Data<shared::DBConnection>,
-                            data: web::Json<application::controller::todo::TodoCreateInput>
-                        |
-                            todo_handler.create(&pool, &data)
-                ),
-            ).route(
-                "/todos/{id}",
-                web::put().to(
-                    move |
-                        pool: web::Data<shared::DBConnection>,
-                        data: web::Json<application::controller::todo::TodoUpdateInput>,
-                        path: web::Path<TodoUpdatePath>
-                    |
-                        todo_handler.update(&pool, &data, &path)
-            )).route(
-                "/todos/{id}",
-                web::delete().to(
-                    move |
-                        pool: web::Data<shared::DBConnection>,
-                        path: web::Path<TodoDeletePath>
-                    |
-                        todo_handler.delete(&pool, &path)))
+            .route("/todos", web::get().to(TodoHandler::list))
+            .route("/todos", web::post().to(TodoHandler::create))
+            .route("/todos/{id}", web::put().to(TodoHandler::update))
+            .route("/todos/{id}", web::delete().to(TodoHandler::delete))
     })
     .bind(format!("0.0.0.0:{}", options.port))?
     .run()
