@@ -15,7 +15,7 @@ mod schema;
 use crate::handler::todo::{TodoDeletePath, TodoUpdatePath};
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
-use actix_web::{web, App, HttpServer, Responder};
+use actix_web::{http::header, web, App, HttpServer, Responder};
 use infrastructure::postgres::connection;
 use structopt::StructOpt;
 
@@ -56,9 +56,12 @@ fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(pool.clone())
-            .wrap(Logger::default())
+            .wrap(Cors::new()
+                .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
+                .allowed_headers(vec![header::ACCEPT, header::AUTHORIZATION, header::CONTENT_TYPE])
+                .max_age(3600)
+            )
             .wrap(Logger::new("%a %{User-Agent}i %s $T"))
-            .wrap(Cors::new().allowed_origin("*"))
             .service(index)
             .route(
                 "/todos",
