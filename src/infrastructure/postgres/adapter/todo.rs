@@ -50,13 +50,13 @@ impl TodoRepository for PgAdapter {
         use crate::schema::todos::dsl::*;
 
         let todo_update = TodoUpdate {
-            id: target_id,
             is_done: dto.is_done,
             name: dto.name.clone(),
         };
 
         let db = conn.get().expect("Connection not found");
         let _result = diesel::update(todos)
+            .filter(id.eq(target_id))
             .set(&todo_update)
             .execute(&db)
             .expect("Todo can not be updated");

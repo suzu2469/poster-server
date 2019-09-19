@@ -22,7 +22,6 @@ pub struct TodoCreate {
 #[derive(AsChangeset)]
 #[table_name = "todos"]
 pub struct TodoUpdate {
-    pub id: i32,
     pub name: String,
     pub is_done: bool,
 }
