@@ -38,7 +38,7 @@ pub fn update(
 }
 pub fn delete(
     pool: web::Data<DBConnection>,
-    path: web::Json<TodoDeletePath>,
+    path: web::Path<TodoDeletePath>,
 ) -> Result<HttpResponse> {
     let todo_controller = todo_controller_factory();
     todo_controller.delete(&pool, path.id)
